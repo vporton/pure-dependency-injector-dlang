@@ -1,0 +1,9 @@
+{
+	"authors": [
+		"Victor Porton"
+	],
+	"copyright": "Copyright © 2019, Victor Porton",
+	"description": "A \"pure\" dependency injector for D",
+	"license": "GPLv3 or later",
+	"name": "pure-dependency-injector"
+}
