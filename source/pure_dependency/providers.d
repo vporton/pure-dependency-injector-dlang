@@ -18,9 +18,14 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-import std.stdio;
+module pure_dependency.providers;
 
-void main()
-{
-	writeln("Edit source/app.d to start your project.");
+// TODO: final methods (here and in other files)
+
+class Provider(Result) {
+    //@property Delegate delegate(); // TODO
+    final Result opCall(A...)(A a) {
+        return _delegate(a);
+    }
+    abstract Result _delegate(...);
 }
