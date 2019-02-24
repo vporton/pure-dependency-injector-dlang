@@ -24,6 +24,7 @@ module pure_dependency.providers;
 
 class Provider(Result) {
     //@property Delegate delegate(); // TODO
+    // TODO: Use a dictionary? struct with nullable fields? to represent a list of default args
     final Result opCall(A...)(A a) {
         return _delegate(a);
     }
