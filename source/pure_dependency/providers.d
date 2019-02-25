@@ -22,6 +22,20 @@ module pure_dependency.providers;
 
 // TODO: final methods (here and in other files)
 
+mixin template ProviderParam(T, string name) {
+    mixin("Nullable!" ~ __traits(identifier, T) ~ ' ' ~ name ~ ';');
+}
+
+mixin template ProviderParams(Fields...) {
+}
+
+S combine(S)(S main, S default_) {
+    S result = default_;
+    foreach (m; __traits(allMembers, S)) {
+
+    }
+}
+
 class Provider(Result) {
     //@property Delegate delegate(); // TODO
     // TODO: Use a dictionary? struct with nullable fields? to represent a list of default args
