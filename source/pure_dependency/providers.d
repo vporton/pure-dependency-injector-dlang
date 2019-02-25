@@ -31,7 +31,7 @@ mixin template ProviderParams(Fields...) {
 
 S combine(S)(S main, S default_) {
     S result = default_;
-    foreach (m; __traits(allMembers, S)) {
+    static foreach (m; __traits(allMembers, S)) {
 
     }
 }
