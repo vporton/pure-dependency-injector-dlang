@@ -20,6 +20,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module pure_dependency.providers;
 
+import std.typecons;
 import std.traits;
 
 // TODO: final methods (here and in other files)
