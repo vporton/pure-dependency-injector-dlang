@@ -20,6 +20,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module pure_dependency.providers;
 
+import std.traits;
+
 // TODO: final methods (here and in other files)
 
 mixin template ProviderParam(T, string name) {
@@ -54,6 +56,10 @@ S.Regular combine(S)(S.WithDefaults main, S.Regular default_) {
             mainMember.isNull ? __traits(getMember, default_, m) : mainMember.get;
     }
     return result;
+}
+
+ReturnType!f callFunctionWithParamsStruct(alias f, S)(S s) {
+    return f(map!(m => __traits(getMember, s, m))(__traits(allMembers, S)));
 }
 
 class Provider(Result) {
