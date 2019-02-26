@@ -26,7 +26,19 @@ mixin template ProviderParam(T, string name) {
     mixin("Nullable!" ~ __traits(identifier, T) ~ ' ' ~ name ~ ';');
 }
 
-mixin template ProviderParams(Fields...) {
+private string ProviderParamsCode(string name, Fields...)() {
+    return "struct " ~ name ~ " {\n" ~
+           "  struct Regular {\n" ~
+           "    // ..." ~
+           "  }\n" ~
+           "  struct WithDefaults {\n" ~
+           "    // ..." ~
+           "  }\n" ~
+           '}';
+}
+
+mixin template ProviderParams(string name, Fields...) {
+    mixin(ProviderParamsCode!(name, Fields)());
 }
 
 S combine(S)(S main, S default_) {
