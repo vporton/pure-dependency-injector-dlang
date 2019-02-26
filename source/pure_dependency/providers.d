@@ -28,12 +28,17 @@ mixin template ProviderParam(T, string name) {
     mixin("Nullable!" ~ __traits(identifier, T) ~ ' ' ~ name ~ ';');
 }
 
-// FIXME: name and T
+private string ProviderParamsCode(string name, Fields...)()
+    if(!all!(t => isType!(t[0]), is(typeof(t[1]) == string) && t.length == 2)(Fields))
+{
+    static assert(0, "ProviderParamsCode argument should be like [[int, \"x\"], [float, \"y\"]]");
+}
+
 private string ProviderParamsCode(string name, Fields...)() {
     immutable string regularFields =
-        map!(f => __traits(identifier, T) ~ ' ' ~ name ~ ';')(Fields).join('\n');
+        map!(f => __traits(identifier, f[0]) ~ ' ' ~ f[1] ~ ';')(Fields).join('\n');
     immutable string fieldsWithDefaults =
-        map!(f => "Nullable!" ~ __traits(identifier, T) ~ ' ' ~ name ~ ';')(Fields).join('\n');
+        map!(f => "Nullable!" ~ __traits(identifier, f[0]) ~ ' ' ~ f[1] ~ ';')(Fields).join('\n');
     return "struct " ~ name ~ " {\n" ~
            "  struct Regular {\n" ~
            "    " ~ regularFields ~ '\n' ~
