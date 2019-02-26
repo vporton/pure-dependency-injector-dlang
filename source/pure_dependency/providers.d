@@ -27,12 +27,16 @@ mixin template ProviderParam(T, string name) {
 }
 
 private string ProviderParamsCode(string name, Fields...)() {
+    immutable string regularFields =
+        map!(f => __traits(identifier, T) ~ ' ' ~ name ~ ';')(Fields).join('\n');
+    immutable string fieldsWithDefaults =
+        map!(f => "Nullable!" ~ __traits(identifier, T) ~ ' ' ~ name ~ ';')(Fields).join('\n');
     return "struct " ~ name ~ " {\n" ~
            "  struct Regular {\n" ~
-           "    // ..." ~
+           "    " ~ regularFields ~ '\n' ~
            "  }\n" ~
            "  struct WithDefaults {\n" ~
-           "    // ..." ~
+           "    " ~ fieldsWithDefaults ~ '\n' ~
            "  }\n" ~
            '}';
 }
