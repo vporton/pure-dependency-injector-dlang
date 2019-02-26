@@ -45,10 +45,10 @@ mixin template ProviderParams(string name, Fields...) {
     mixin(ProviderParamsCode!(name, Fields)());
 }
 
-S combine(S)(S main, S default_) {
+S.Regular combine(S)(S.WithDefaults main, S.Regular default_) {
     S result = default_;
     static foreach (m; __traits(allMembers, S)) {
-
+        //result
     }
 }
 
