@@ -26,6 +26,7 @@ mixin template ProviderParam(T, string name) {
     mixin("Nullable!" ~ __traits(identifier, T) ~ ' ' ~ name ~ ';');
 }
 
+// FIXME: name and T
 private string ProviderParamsCode(string name, Fields...)() {
     immutable string regularFields =
         map!(f => __traits(identifier, T) ~ ' ' ~ name ~ ';')(Fields).join('\n');
@@ -48,8 +49,11 @@ mixin template ProviderParams(string name, Fields...) {
 S.Regular combine(S)(S.WithDefaults main, S.Regular default_) {
     S result = default_;
     static foreach (m; __traits(allMembers, S)) {
-        //result
+        immutable mainMember = __traits(getMember, main, m);
+        __traits(getMember, result, m) =
+            mainMember.isNull ? __traits(getMember, default_, m) : mainMember.get;
     }
+    return result;
 }
 
 class Provider(Result) {
