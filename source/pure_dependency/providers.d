@@ -34,3 +34,5 @@ class Provider(Result) {
         return delegate_;
     }
 }
+
+// TODO: Coroutine providers?
