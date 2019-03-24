@@ -41,5 +41,3 @@ class Singleton(Result) : Provider!Result {
         return memoizeMember!delegate_(a);
     }
 }
-
-// TODO: Coroutine providers?
