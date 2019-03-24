@@ -22,6 +22,7 @@ module pure_dependency.providers;
 
 import std.typecons;
 import std.traits;
+import memoize;
 
 // TODO: final methods (here and in other files)
 
@@ -32,6 +33,12 @@ class Provider(Result) {
     abstract Result delegate_(...);
     final @property Result delegate (...) provider() {
         return delegate_;
+    }
+}
+
+class Singleton(Result) : Provider!Result {
+    final Result opCall(A...)(A a) {
+        return memoizeMember!delegate_(a);
     }
 }
 
