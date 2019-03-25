@@ -25,42 +25,48 @@ import std.traits;
 import memoize;
 import struct_params;
 
-class Provider(Result) {
-    final Result opCall(A...)(A a) {
-        return delegate_(a);
+class Provider(Result, Params...) {
+    final Result opCall(Params params) {
+        return delegate_(params);
     }
-    final Result call(S)(S s) {
-        return callMemberFunctionWithParamsStruct!(this, "opCall")(s); // TODO: Can "Member" be removed?
+    final Result call(Params params) {
+        return callMemberFunctionWithParamsStruct!(this, "opCall")(params); // TODO: Can "Member" be removed?
     }
-    abstract Result delegate_(...);
-    final @property Result delegate (...) provider() {
+    abstract Result delegate_(Params params);
+    final @property Result delegate (Params params) provider() {
         return delegate_;
+    }
+}
+
+class ClassFactory(Result, Params...) : Provider!(Result, Params) {
+    Result delegate_(Params params) {
+        return new Result(params);
     }
 }
 
 /**
 Not thread safe!
 */
-class Singleton(Result) : Provider!Result {
-    final Result opCall(A...)(A a) {
-        return noLockMemoizeMember!delegate_(a);
+class Singleton(Result, Params...) : Provider!(Result, Params) {
+    final Result opCall(Params params) {
+        return noLockMemoizeMember!delegate_(params);
     }
 }
 
-class Object_(obj) : Provider!Result {
-    final Result opCall(A...)(A a) {
+class Object_(obj, Params...) : Provider!(Result, Params) {
+    final Result opCall(Params params) {
         return obj;
     }
 }
 
-class ThreadSafeSingleton(Result) : Provider!Result {
-    final synchronized Result opCall(A...)(A a) {
-        return memoizeMember!delegate_(a);
+class ThreadSafeSingleton(Result, Params...) : Provider!(Result, Params) {
+    final synchronized Result opCall(Params params) {
+        return memoizeMember!delegate_(params);
     }
 }
 
-class ThreadLocalSingleton(Result) : Provider!Result {
-    final synchronized Result opCall(A...)(A a) {
-        return memoize!delegate_(a);
+class ThreadLocalSingleton(Result, Params...) : Provider!(Result, Params) {
+    final synchronized Result opCall(Params params) {
+        return memoize!delegate_(params);
     }
 }
