@@ -44,6 +44,12 @@ class ClassFactory(Result, Params...) : Provider!(Result, Params) {
     }
 }
 
+class Callable(Result, Params...) : Provider!(Result, Params) {
+    Result delegate_(Params params) {
+        return Result(params);
+    }
+}
+
 /**
 Not thread safe!
 */
