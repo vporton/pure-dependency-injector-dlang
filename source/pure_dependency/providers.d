@@ -25,8 +25,6 @@ import std.traits;
 import memoize;
 import struct_params;
 
-// TODO: final methods (here and in other files)
-
 class Provider(Result) {
     final Result opCall(A...)(A a) {
         return delegate_(a);
@@ -40,9 +38,12 @@ class Provider(Result) {
     }
 }
 
+/**
+Not thread safe!
+*/
 class Singleton(Result) : Provider!Result {
     final Result opCall(A...)(A a) {
-        return memoizeMember!delegate_(a);
+        return noLockMemoizeMember!delegate_(a);
     }
 }
 
@@ -58,4 +59,8 @@ class ThreadSafeSingleton(Result) : Provider!Result {
     }
 }
 
-// TODO: Thread local singleton
+class ThreadLocalSingleton(Result) : Provider!Result {
+    final synchronized Result opCall(A...)(A a) {
+        return memoize!delegate_(a);
+    }
+}
