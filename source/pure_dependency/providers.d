@@ -32,7 +32,7 @@ class Provider(Result) {
         return delegate_(a);
     }
     final Result call(S)(S s) {
-        return callMemberFunctionWithParamsStruct!(this, "delegate_")(s);
+        return callMemberFunctionWithParamsStruct!(this, "opCall")(s);
     }
     abstract Result delegate_(...);
     final @property Result delegate (...) provider() {
