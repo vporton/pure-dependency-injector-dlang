@@ -38,6 +38,8 @@ class Provider(Result, Params...) {
     }
 }
 
+// TODO: It seems ClassFactory & StructFactory can be joined together using conditional compilation.
+
 class ClassFactory(Result, Params...) : Provider!(Result, Params) {
     Result delegate_(Params params) {
         return new Result(params);
