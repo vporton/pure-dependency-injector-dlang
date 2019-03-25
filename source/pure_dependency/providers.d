@@ -44,11 +44,19 @@ class ClassFactory(Result, Params...) : Provider!(Result, Params) {
     }
 }
 
-class Callable(Result, Params...) : Provider!(Result, Params) {
+class StructFactory(Result, Params...) : Provider!(Result, Params) {
     Result delegate_(Params params) {
         return Result(params);
     }
 }
+
+class Callable(Function, Params...) : Provider!(Result, Params) {
+    ReturnType!Function delegate_(Params params) {
+        return Function(params);
+    }
+}
+
+// TODO: singletons for both classes and structs (and callables?)
 
 /**
 Not thread safe!
