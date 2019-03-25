@@ -23,12 +23,16 @@ module pure_dependency.providers;
 import std.typecons;
 import std.traits;
 import memoize;
+import struct_params;
 
 // TODO: final methods (here and in other files)
 
 class Provider(Result) {
     final Result opCall(A...)(A a) {
         return delegate_(a);
+    }
+    final Result call(S)(S s) {
+        return callMemberFunctionWithParamsStruct!(this, "delegate_")(s);
     }
     abstract Result delegate_(...);
     final @property Result delegate (...) provider() {
@@ -41,3 +45,11 @@ class Singleton(Result) : Provider!Result {
         return memoizeMember!delegate_(a);
     }
 }
+
+class Object_(obj) : Provider!Result {
+    final Result opCall(A...)(A a) {
+        return obj;
+    }
+}
+
+// TODO: Thread local and thread safe singletons
