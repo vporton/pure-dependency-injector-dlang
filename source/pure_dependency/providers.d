@@ -52,4 +52,10 @@ class Object_(obj) : Provider!Result {
     }
 }
 
-// TODO: Thread local and thread safe singletons
+class ThreadSafeSingleton(Result) : Provider!Result {
+    final synchronized Result opCall(A...)(A a) {
+        return memoizeMember!delegate_(a);
+    }
+}
+
+// TODO: Thread local singleton
