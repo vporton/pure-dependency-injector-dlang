@@ -59,10 +59,11 @@ class Callable(Function, Params...) : Provider!(Result, Params) {
 }
 
 class BaseGeneralSingleton(Base) : Provider!(Base.Result, Base.Params) {
-    private Base base;
+    private Base _base;
     this(Base base) {
-        this.base = base;
+        _base = base;
     }
+    @property Base base() { return _base; }
 }
 
 /**
