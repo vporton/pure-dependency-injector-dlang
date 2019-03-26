@@ -34,20 +34,20 @@ class Provider(Result, Params...) {
     final Result call(Params params) {
         return callMemberFunctionWithParamsStruct!(this, "opCall")(params); // TODO: Can "Member" be removed?
     }
-    abstract Result delegate_(Params params);
+    abstract ref Result delegate_(Params params);
     final @property Result delegate (Params params) provider() {
         return delegate_;
     }
 }
 
 class ClassFactory(Result, Params...) : Provider!(Result, Params) {
-    Result delegate_(Params params) {
+    ref Result delegate_(Params params) {
         return new Result(params);
     }
 }
 
 class StructFactory(Result, Params...) : Provider!(Result, Params) {
-    Result delegate_(Params params) {
+    ref Result delegate_(Params params) {
         return Result(params);
     }
 }
@@ -70,19 +70,19 @@ class BaseGeneralSingleton(Base) : Provider!(Base.Result, Base.Params) {
 Not thread safe!
 */
 class Singleton(Base) : BaseGeneralSingleton!Base {
-    override Result delegate_(Params params) {
+    override ref Result delegate_(Params params) {
         return noLockMemoizeMember!(base, "delegate_")(params);
     }
 }
 
 class ThreadSafeSingleton(Base) : BaseGeneralSingleton!Base {
-    override Result delegate_(Params params) {
+    override ref Result delegate_(Params params) {
         return memoizeMember!(base, "delegate_")(params);
     }
 }
 
 class ThreadLocalSingleton(Base) : BaseGeneralSingleton!Base {
-    override synchronized Result delegate_(Params params) {
+    override synchronized ref Result delegate_(Params params) {
         return memoizeMember!(base, "delegate_")(params);
     }
 }
