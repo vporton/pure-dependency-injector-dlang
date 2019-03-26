@@ -28,14 +28,14 @@ import struct_params;
 class Provider(Result, Params...) {
     alias Result = Result;
     alias Params = Params;
-    final Result opCall(Params params) {
+    final ref Result opCall(Params params) {
         return delegate_(params);
     }
-    final Result call(Params params) {
+    final ref Result call(Params params) {
         return callMemberFunctionWithParamsStruct!(this, "opCall")(params); // TODO: Can "Member" be removed?
     }
     abstract ref Result delegate_(Params params);
-    final @property Result delegate (Params params) provider() {
+    final @property ref Result delegate (Params params) provider() {
         return delegate_;
     }
 }
