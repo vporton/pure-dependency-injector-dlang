@@ -26,6 +26,7 @@ import memoize;
 import struct_params;
 
 class Provider(Result, Params...) {
+    alias Result = Result;
     alias Params = Params;
     final Result opCall(Params params) {
         return delegate_(params);
@@ -57,31 +58,37 @@ class Callable(Function, Params...) : Provider!(Result, Params) {
     }
 }
 
-// TODO: singletons for both classes and structs (and callables?)
+class BaseGeneralSingleton(Base) : Provider!(Base.Result, Base.Params) {
+    private Base base;
+    this(Base base) {
+        this.base = base;
+    }
+}
 
 /**
 Not thread safe!
 */
-class Singleton(Result, Params...) : Provider!(Result, Params) {
-    final Result opCall(Params params) {
-        return noLockMemoizeMember!delegate_(params);
+class Singleton(Base) : BaseGeneralSingleton!Base {
+    override Result delegate_(Params params) {
+        return noLockMemoizeMember!(base, "delegate_")(params);
     }
 }
 
-class Object_(obj, Params...) : Provider!(Result, Params) {
-    final Result opCall(Params params) {
+class ThreadSafeSingleton(Base) : BaseGeneralSingleton!Base {
+    override Result delegate_(Params params) {
+        return memoizeMember!(base, "delegate_")(params);
+    }
+}
+
+class ThreadLocalSingleton(Base) : BaseGeneralSingleton!Base {
+    override synchronized Result delegate_(Params params) {
+        return memoizeMember!(base, "delegate_")(params);
+    }
+}
+
+// FIXME: Missing type of `obj`
+class Object_(obj, Params...) : Provider!(typeof(obj), Params) {
+    override Result delegate_(Params params) {
         return obj;
-    }
-}
-
-class ThreadSafeSingleton(Result, Params...) : Provider!(Result, Params) {
-    final synchronized Result opCall(Params params) {
-        return memoizeMember!delegate_(params);
-    }
-}
-
-class ThreadLocalSingleton(Result, Params...) : Provider!(Result, Params) {
-    final synchronized Result opCall(Params params) {
-        return memoize!delegate_(params);
     }
 }
