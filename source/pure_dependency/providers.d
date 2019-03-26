@@ -86,9 +86,8 @@ class ThreadLocalSingleton(Base) : BaseGeneralSingleton!Base {
     }
 }
 
-// FIXME: Missing type of `obj`
-class Object_(obj, Params...) : Provider!(typeof(obj), Params) {
-    override Result delegate_(Params params) {
+class Object_(Result, Result obj, Params...) : Provider!(Result, Params) {
+    override ref Result delegate_(Params params) {
         return obj;
     }
 }
