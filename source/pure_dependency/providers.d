@@ -26,6 +26,7 @@ import memoize;
 import struct_params;
 
 class Provider(Result, Params...) {
+    alias Params = Params;
     final Result opCall(Params params) {
         return delegate_(params);
     }
@@ -37,8 +38,6 @@ class Provider(Result, Params...) {
         return delegate_;
     }
 }
-
-// TODO: It seems ClassFactory & StructFactory can be joined together using conditional compilation.
 
 class ClassFactory(Result, Params...) : Provider!(Result, Params) {
     Result delegate_(Params params) {
