@@ -53,7 +53,7 @@ class StructFactory(Result, Params...) : Provider!(Result, Params) {
 }
 
 class Callable(Function, Params...) : Provider!(Result, Params) {
-    ReturnType!Function delegate_(Params params) {
+    ref ReturnType!Function delegate_(Params params) {
         return Function(params);
     }
 }
