@@ -25,9 +25,9 @@ import std.traits;
 import memoize;
 import struct_params;
 
-class Provider(Result, Params...) {
-    alias Result = Result;
-    alias Params = Params;
+class Provider(Result_, Params_...) {
+    alias Result = Result_;
+    alias Params = Params_;
     final ref Result opCall(Params params) const {
         return delegate_(params);
     }
@@ -40,20 +40,20 @@ class Provider(Result, Params...) {
     }
 }
 
-class ClassFactory(Result, Params...) : Provider!(Result, Params) {
-    ref Result delegate_(Params params) const {
-        return new Result(params);
-    }
-}
+//class ClassFactory(Result, Params...) : Provider!(Result, Params) {
+//    override ref Result delegate_(Params params) const {
+//        return new Result(params);
+//    }
+//}
+//
+//class StructFactory(Result, Params...) : Provider!(Result, Params) {
+//    override ref Result delegate_(Params params) const {
+//        return Result(params);
+//    }
+//}
 
-class StructFactory(Result, Params...) : Provider!(Result, Params) {
-    ref Result delegate_(Params params) const {
-        return Result(params);
-    }
-}
-
-class Callable(Function, Params...) : Provider!(Result, Params) {
-    ref ReturnType!Function delegate_(Params params) const {
+class Callable(alias Function) : Provider!(ReturnType!Function, Parameters!Function) {
+    override ref ReturnType!Function delegate_(Params params) const {
         return Function(params);
     }
 }
@@ -91,4 +91,12 @@ class Object_(Result, Result obj, Params...) : Provider!(Result, Params) {
     override ref Result delegate_(Params params) const {
         return obj;
     }
+}
+
+unittest {
+    class C {
+        int v;
+        this(int a, int b) { v = a + b; }
+    }
+    immutable cFactory = Callable!((int a, int b) => new C(a, b));
 }
