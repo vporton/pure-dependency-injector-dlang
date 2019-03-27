@@ -98,5 +98,5 @@ unittest {
         int v;
         this(int a, int b) { v = a + b; }
     }
-    immutable cFactory = Callable!((int a, int b) => new C(a, b));
+    immutable cFactory = Callable!((a, b) => new C(a, b));
 }
