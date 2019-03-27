@@ -87,7 +87,7 @@ class ThreadLocalSingleton(Base) : BaseGeneralSingleton!Base {
     }
 }
 
-class Object_(Result, Result obj, Params...) : Provider!(Result, Params) {
+class Object_(alias obj, Params...) : Provider!(typeof(obj), Params) {
     override ref Result delegate_(Params params) const {
         return obj;
     }
