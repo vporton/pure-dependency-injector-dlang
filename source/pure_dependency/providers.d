@@ -46,7 +46,7 @@ class ReferenceProvider(Result_, Params_...) {
     final ref Result opCall(Params params) const {
         return delegate_(params);
     }
-    final ref Result call(Params params) const {
+    final ref Result call(S)(S s) const {
         return callMemberFunctionWithParamsStruct!(this, "opCall", S)(s); // TODO: Can "Member" be removed?
     }
     abstract ref Result delegate_(Params params) const;
