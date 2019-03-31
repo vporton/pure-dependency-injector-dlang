@@ -112,13 +112,13 @@ class ReferenceSingleton(Base) : ReferenceBaseGeneralSingleton!Base {
 
 class ThreadSafeSingleton(Base) : BaseGeneralSingleton!Base {
     override Result delegate_(Params params) const {
-        return memoizeMember!(base, "delegate_")(params);
+        return synchroizedMemoizeMember!(base, "delegate_")(params);
     }
 }
 
 class ReferenceThreadSafeSingleton(Base) : ReferenceBaseGeneralSingleton!Base {
     override ref Result delegate_(Params params) const {
-        return memoizeMember!(base, "delegate_")(params);
+        return synchroizedMemoizeMember!(base, "delegate_")(params);
     }
 }
 
