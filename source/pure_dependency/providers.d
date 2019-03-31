@@ -28,6 +28,21 @@ import struct_params;
 class Provider(Result_, Params_...) {
     alias Result = Result_;
     alias Params = Params_;
+    final Result opCall(Params params) const {
+        return delegate_(params);
+    }
+    final Result call(Params params) const {
+        return callMemberFunctionWithParamsStruct!(this, "opCall")(params); // TODO: Can "Member" be removed?
+    }
+    abstract Result delegate_(Params params) const;
+    final @property Result delegate (Params params) provider() const {
+        return delegate_;
+    }
+}
+
+class ReferenceProvider(Result_, Params_...) {
+    alias Result = Result_;
+    alias Params = Params_;
     final ref Result opCall(Params params) const {
         return delegate_(params);
     }
@@ -53,6 +68,12 @@ class Provider(Result_, Params_...) {
 //}
 
 class Callable(alias Function) : Provider!(ReturnType!Function, Parameters!Function) {
+    override ReturnType!Function delegate_(Params params) const {
+        return Function(params);
+    }
+}
+
+class ReferenceCallable(alias Function) : ReferenceProvider!(ReturnType!Function, Parameters!Function) {
     override ref ReturnType!Function delegate_(Params params) const {
         return Function(params);
     }
@@ -66,28 +87,60 @@ class BaseGeneralSingleton(Base) : Provider!(Base.Result, Base.Params) {
     @property Base base() const { return _base; }
 }
 
+class ReferenceBaseGeneralSingleton(Base) : ReferenceProvider!(Base.Result, Base.Params) {
+    private Base _base;
+    this(Base base) {
+        _base = base;
+    }
+    @property Base base() const { return _base; }
+}
+
 /**
 Not thread safe!
 */
 class Singleton(Base) : BaseGeneralSingleton!Base {
+    override Result delegate_(Params params) const {
+        return noLockMemoizeMember!(base, "delegate_")(params);
+    }
+}
+
+class ReferenceSingleton(Base) : ReferenceBaseGeneralSingleton!Base {
     override ref Result delegate_(Params params) const {
         return noLockMemoizeMember!(base, "delegate_")(params);
     }
 }
 
 class ThreadSafeSingleton(Base) : BaseGeneralSingleton!Base {
+    override Result delegate_(Params params) const {
+        return memoizeMember!(base, "delegate_")(params);
+    }
+}
+
+class ReferenceThreadSafeSingleton(Base) : ReferenceBaseGeneralSingleton!Base {
     override ref Result delegate_(Params params) const {
         return memoizeMember!(base, "delegate_")(params);
     }
 }
 
 class ThreadLocalSingleton(Base) : BaseGeneralSingleton!Base {
+    override synchronized Result delegate_(Params params) const {
+        return memoizeMember!(base, "delegate_")(params);
+    }
+}
+
+class ReferenceThreadLocalSingleton(Base) : ReferenceBaseGeneralSingleton!Base {
     override synchronized ref Result delegate_(Params params) const {
         return memoizeMember!(base, "delegate_")(params);
     }
 }
 
 class Object_(alias obj, Params...) : Provider!(typeof(obj), Params) {
+    override Result delegate_(Params params) const {
+        return obj;
+    }
+}
+
+class ReferenceObject_(alias obj, Params...) : ReferenceProvider!(typeof(obj), Params) {
     override ref Result delegate_(Params params) const {
         return obj;
     }
