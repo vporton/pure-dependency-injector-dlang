@@ -152,4 +152,5 @@ unittest {
         this(int a, int b) { v = a + b; }
     }
     immutable Callable!((int a, int b) => new C(a, b)) cFactory;
+    assert(cFactory(1, 2).v == 3);
 }
