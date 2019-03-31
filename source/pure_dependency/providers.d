@@ -31,12 +31,12 @@ class Provider(Result_, Params_...) {
     final Result opCall(Params params) const {
         return delegate_(params);
     }
-    final Result call(Params params) const {
-        return callMemberFunctionWithParamsStruct!(this, "opCall")(params); // TODO: Can "Member" be removed?
+    final Result call(S)(S s) const {
+        return callMemberFunctionWithParamsStruct!(this, "opCall", S)(s); // TODO: Can "Member" be removed?
     }
     abstract Result delegate_(Params params) const;
     final @property Result delegate (Params params) provider() const {
-        return delegate_;
+        return &delegate_;
     }
 }
 
@@ -47,11 +47,11 @@ class ReferenceProvider(Result_, Params_...) {
         return delegate_(params);
     }
     final ref Result call(Params params) const {
-        return callMemberFunctionWithParamsStruct!(this, "opCall")(params); // TODO: Can "Member" be removed?
+        return callMemberFunctionWithParamsStruct!(this, "opCall", S)(s); // TODO: Can "Member" be removed?
     }
     abstract ref Result delegate_(Params params) const;
     final @property ref Result delegate (Params params) provider() const {
-        return delegate_;
+        return &delegate_;
     }
 }
 
@@ -151,5 +151,5 @@ unittest {
         int v;
         this(int a, int b) { v = a + b; }
     }
-    immutable cFactory = Callable!((a, b) => new C(a, b));
+    immutable Callable!((int a, int b) => new C(a, b)) cFactory;
 }
