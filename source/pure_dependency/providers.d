@@ -140,8 +140,8 @@ class FixedObject(alias obj) : Provider!(typeof(obj)) {
     }
 }
 
-class ReferenceFixedObject(alias obj, Params...) : ReferenceProvider!(typeof(obj), Params) {
-    override ref Result delegate_(Params params) const {
+class ReferenceFixedObject(alias obj) : ReferenceProvider!(typeof(obj)) {
+    override ref Result delegate_() const {
         return obj;
     }
 }
