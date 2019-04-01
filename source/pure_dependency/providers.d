@@ -134,8 +134,8 @@ class ReferenceThreadLocalSingleton(Base) : ReferenceBaseGeneralSingleton!Base {
     }
 }
 
-class FixedObject(alias obj, Params...) : Provider!(typeof(obj), Params) {
-    override Result delegate_(Params params) const {
+class FixedObject(alias obj) : Provider!(typeof(obj)) {
+    override Result delegate_() const {
         return obj;
     }
 }
