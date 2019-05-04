@@ -42,12 +42,13 @@ class Provider(Result_, Params_...) {
     /// Call it with a structure or class as the argument (expanding its members into arguments
     /// in order).
     final Result call(S)(S s) const {
-        return callMemberFunctionWithParamsStruct!(this, "opCall", S)(s); // TODO: Can "Member" be removed?
+        return callMemberFunctionWithParamsStruct!(this, "opCall", S)(s);
     }
     /// The abstarct virtual function used to create the provided object.
     abstract Result delegate_(Params params) const;
+    alias DelegateType = Result delegate (Params params) const;
     /// Returns `delegate_` as a delegate.
-    final @property Result delegate (Params params) provider() const {
+    final @property DelegateType provider() const {
         return &delegate_;
     }
 }
@@ -68,12 +69,13 @@ Base class for reference providers.
     /// Call it with a structure or class as the argument (expanding its members into arguments
     /// in order).
     final ref Result call(S)(S s) const {
-        return callMemberFunctionWithParamsStruct!(this, "opCall", S)(s); // TODO: Can "Member" be removed?
+        return callMemberFunctionWithParamsStruct!(this, "opCall", S)(s);
     }
     /// The abstarct virtual function used to create the provided object.
     abstract ref Result delegate_(Params params) const;
+    alias DelegateType = ref Result delegate (Params params) const;
     /// Returns `delegate_` as a delegate.
-    final @property ref Result delegate (Params params) provider() const {
+    final @property DelegateType provider() const {
         return &delegate_;
     }
 }
@@ -118,7 +120,7 @@ Base class for non-reference singletons. Uses another provider to create the obj
 `Base` is the type of this another provider.
 */
 class BaseGeneralSingleton(Base) : Provider!(Base.Result, Base.Params) {
-    private Base _base; // TODO: make it immutable?
+    private Base _base;
     /// Create the singleton with given base provider.
     this(Base base) {
         _base = base;
@@ -133,7 +135,7 @@ Base class for reference singletons. Uses another provider to create the object.
 `Base` is the type of this another provider.
 */
 class ReferenceBaseGeneralSingleton(Base) : ReferenceProvider!(Base.Result, Base.Params) {
-    private Base _base; // TODO: make it immutable?
+    private Base _base;
     /// Create the singleton with given base provider.
     this(Base base) {
         _base = base;
@@ -146,8 +148,9 @@ class ReferenceBaseGeneralSingleton(Base) : ReferenceProvider!(Base.Result, Base
 Non-reference thread-unsafe singleton.
 */
 class ThreadUnsafeSingleton(Base) : BaseGeneralSingleton!Base {
+    this(Base base) { super(base); }
     override Result delegate_(Params params) const {
-        return noLockMemoizeMember!(base, "delegate_")(params);
+        return noLockMemoizeMember!(Base, "delegate_")(base, params);
     }
 }
 
@@ -155,8 +158,9 @@ class ThreadUnsafeSingleton(Base) : BaseGeneralSingleton!Base {
 Reference thread-unsafe singleton.
 */
 class ReferenceThreadUnsafeSingleton(Base) : ReferenceBaseGeneralSingleton!Base {
+    this(Base base) { super(base); }
     override ref Result delegate_(Params params) const {
-        return noLockMemoizeMember!(base, "delegate_")(params);
+        return noLockMemoizeMember!(Base, "delegate_")(base, params);
     }
 }
 
@@ -164,8 +168,9 @@ class ReferenceThreadUnsafeSingleton(Base) : ReferenceBaseGeneralSingleton!Base 
 Non-reference thread-safe singleton.
 */
 class ThreadSafeSingleton(Base) : BaseGeneralSingleton!Base {
+    this(Base base) { super(base); }
     override Result delegate_(Params params) const {
-        return synchroizedMemoizeMember!(base, "delegate_")(params);
+        return synchroizedMemoizeMember!(Base, "delegate_")(base, params);
     }
 }
 
@@ -173,8 +178,9 @@ class ThreadSafeSingleton(Base) : BaseGeneralSingleton!Base {
 Reference thread-safe singleton.
 */
 class ReferenceThreadSafeSingleton(Base) : ReferenceBaseGeneralSingleton!Base {
+    this(Base base) { super(base); }
     override ref Result delegate_(Params params) const {
-        return synchroizedMemoizeMember!(base, "delegate_")(params);
+        return synchroizedMemoizeMember!(Base, "delegate_")(base, params);
     }
 }
 
@@ -182,8 +188,11 @@ class ReferenceThreadSafeSingleton(Base) : ReferenceBaseGeneralSingleton!Base {
 Non-reference thread-local singleton.
 */
 class ThreadLocalSingleton(Base) : BaseGeneralSingleton!Base {
-    override synchronized Result delegate_(Params params) const {
-        return memoizeMember!(base, "delegate_")(params);
+    this(Base base) { super(base); }
+    override Result delegate_(Params params) const {
+        synchronized {
+            return memoizeMember!(Base, "delegate_")(base, params);
+        }
     }
 }
 
@@ -191,8 +200,11 @@ class ThreadLocalSingleton(Base) : BaseGeneralSingleton!Base {
 Reference thread-local singleton.
 */
 class ReferenceThreadLocalSingleton(Base) : ReferenceBaseGeneralSingleton!Base {
-    override synchronized ref Result delegate_(Params params) const {
-        return memoizeMember!(base, "delegate_")(params);
+    this(Base base) { super(base); }
+    override ref Result delegate_(Params params) const {
+        synchronized {
+            return memoizeMember!(Base, "delegate_")(base, params);
+        }
     }
 }
 
@@ -236,9 +248,9 @@ Reference singleton provider that calls some function to create the provided obj
 
 `Function` the function called to create the provided object.
 */
-class ReferenceThreadUnsafeCallableSingleton(alias Function) : ReferenceThreadUnsafeSingleton!(Callable!Function) {
+class ReferenceThreadUnsafeCallableSingleton(alias Function) : ReferenceThreadUnsafeSingleton!(ReferenceCallable!Function) {
     this() {
-        super(new Callable!Function);
+        super(new ReferenceCallable!Function);
     }
 }
 
@@ -258,9 +270,9 @@ Reference singleton provider that calls some function to create the provided obj
 
 `Function` the function called to create the provided object.
 */
-class ReferenceThreadSafeCallableSingleton(alias Function) : ReferenceThreadSafeSingleton!(Callable!Function) {
+class ReferenceThreadSafeCallableSingleton(alias Function) : ReferenceThreadSafeSingleton!(ReferenceCallable!Function) {
     this() {
-        super(new Callable!Function);
+        super(new ReferenceCallable!Function);
     }
 }
 
@@ -280,9 +292,9 @@ Reference singleton provider that calls some function to create the provided obj
 
 `Function` the function called to create the provided object.
 */
-class ReferenceThreadLocalCallableSingleton(alias Function) : ReferenceThreadLocalSingleton!(Callable!Function) {
+class ReferenceThreadLocalCallableSingleton(alias Function) : ReferenceThreadLocalSingleton!(ReferenceCallable!Function) {
     this() {
-        super(new Callable!Function);
+        super(new ReferenceCallable!Function);
     }
 }
 
@@ -293,6 +305,27 @@ unittest {
     }
     auto cFactory = new Callable!((int a, int b) => new C(a, b));
     assert(cFactory(1, 2).v == 3);
+}
+
+unittest {
+    int obj = 3;
+    int f(int a, int b) { return a + b; }
+    ref int g() { return obj; }
+
+    assert(new FixedObject!obj()() == obj);
+    assert(&new ReferenceFixedObject!obj()() == &obj);
+
+    assert(new ThreadUnsafeCallableSingleton!f()(2, 5) == 7);
+    auto refSingleton = new ReferenceThreadUnsafeCallableSingleton!g();
+    assert(refSingleton() == refSingleton());
+
+    assert(new ThreadSafeCallableSingleton!f()(2, 5) == 7);
+    auto refSingleton2 = new ReferenceThreadSafeCallableSingleton!g();
+    assert(refSingleton2() == refSingleton2());
+
+    assert(new ThreadLocalCallableSingleton!f()(2, 5) == 7);
+    auto refSingleton3 = new ReferenceThreadLocalCallableSingleton!g();
+    assert(refSingleton3() == refSingleton3());
 }
 
 // TODO: Test FixedObject and reference providers.
