@@ -218,7 +218,73 @@ class ReferenceFixedObject(alias obj) : ReferenceProvider!(typeof(obj)) {
     }
 }
 
-// TODO: Specific singletons (for functions, etc.)?
+// TODO: *CallableSingleton classes are of an inefficient implementation (holding a pointer).
+
+/**
+Non-reference singleton provider that calls some function to create the provided object.
+
+`Function` the function called to create the provided object.
+*/
+class ThreadUnsafeCallableSingleton(alias Function) : ThreadUnsafeSingleton!(Callable!Function) {
+    this() {
+        super(new Callable!Function);
+    }
+}
+
+/**
+Reference singleton provider that calls some function to create the provided object.
+
+`Function` the function called to create the provided object.
+*/
+class ReferenceThreadUnsafeCallableSingleton(alias Function) : ReferenceThreadUnsafeSingleton!(Callable!Function) {
+    this() {
+        super(new Callable!Function);
+    }
+}
+
+/**
+Non-reference singleton provider that calls some function to create the provided object.
+
+`Function` the function called to create the provided object.
+*/
+class ThreadSafeCallableSingleton(alias Function) : ThreadSafeSingleton!(Callable!Function) {
+    this() {
+        super(new Callable!Function);
+    }
+}
+
+/**
+Reference singleton provider that calls some function to create the provided object.
+
+`Function` the function called to create the provided object.
+*/
+class ReferenceThreadSafeCallableSingleton(alias Function) : ReferenceThreadSafeSingleton!(Callable!Function) {
+    this() {
+        super(new Callable!Function);
+    }
+}
+
+/**
+Non-reference singleton provider that calls some function to create the provided object.
+
+`Function` the function called to create the provided object.
+*/
+class ThreadLocalCallableSingleton(alias Function) : ThreadLocalSingleton!(Callable!Function) {
+    this() {
+        super(new Callable!Function);
+    }
+}
+
+/**
+Reference singleton provider that calls some function to create the provided object.
+
+`Function` the function called to create the provided object.
+*/
+class ReferenceThreadLocalCallableSingleton(alias Function) : ReferenceThreadLocalSingleton!(Callable!Function) {
+    this() {
+        super(new Callable!Function);
+    }
+}
 
 unittest {
     class C {
