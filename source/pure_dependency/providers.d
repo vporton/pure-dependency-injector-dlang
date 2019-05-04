@@ -126,7 +126,7 @@ class BaseGeneralSingleton(Base) : Provider!(Base.Result, Base.Params) {
         _base = base;
     }
     /// Get the base provider.
-    @property Base base() const { return _base; }
+    @property const(Base) base() const { return _base; }
 }
 
 /**
@@ -141,7 +141,7 @@ class ReferenceBaseGeneralSingleton(Base) : ReferenceProvider!(Base.Result, Base
         _base = base;
     }
     /// Get the base provider.
-    @property Base base() const { return _base; }
+    @property const(Base) base() const { return _base; }
 }
 
 /**
