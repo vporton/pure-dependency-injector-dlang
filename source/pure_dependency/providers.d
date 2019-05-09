@@ -36,7 +36,7 @@ class Provider(Result_, Params_...) {
     alias Result = Result_; /// the type of the object to be provided.
     alias Params = Params_; /// the type of provider parameters.
     /// Call the provider.
-    final const(Result) opCall(Params params) const {
+    final const(Result) opCall(Params params) {
         return delegate_(params);
     }
     /// Call it with a structure or class as the argument (expanding its members into arguments
@@ -45,10 +45,10 @@ class Provider(Result_, Params_...) {
         return callMemberFunctionWithParamsStruct!(this, "opCall", S)(s);
     }
     /// The abstract virtual function used to create the provided object.
-    abstract const(Result) delegate_(Params params) const;
-    alias DelegateType = const(Result) delegate (Params params) const;
+    abstract const(Result) delegate_(Params params);
+    alias DelegateType = const(Result) delegate (Params params);
     /// Returns `delegate_` as a delegate.
-    final @property DelegateType provider() const {
+    final @property DelegateType provider() {
         return &delegate_;
     }
 }
@@ -64,7 +64,7 @@ class ReferenceProvider(Result_, Params_...) {
     alias Result = Result_; /// the type of the object to be provided.
     alias Params = Params_; /// the type of provider parameters.
     /// Call the provider.
-    final ref Result opCall(Params params) const {
+    final ref Result opCall(Params params) {
         return delegate_(params);
     }
     /// Call it with a structure or class as the argument (expanding its members into arguments
@@ -73,22 +73,22 @@ class ReferenceProvider(Result_, Params_...) {
         return callMemberFunctionWithParamsStruct!(this, "opCall", S)(s);
     }
     /// The abstract virtual function used to create the provided object.
-    abstract ref Result delegate_(Params params) const;
-    alias DelegateType = ref Result delegate (Params params) const;
+    abstract ref Result delegate_(Params params);
+    alias DelegateType = ref Result delegate (Params params);
     /// Returns `delegate_` as a delegate.
-    final @property DelegateType provider() const {
+    final @property DelegateType provider() {
         return &delegate_;
     }
 }
 
 //class ClassFactory(Result, Params...) : Provider!(Result, Params) {
-//    override ref Result delegate_(Params params) const {
+//    override ref Result delegate_(Params params) {
 //        return new Result(params);
 //    }
 //}
 //
 //class StructFactory(Result, Params...) : Provider!(Result, Params) {
-//    override ref Result delegate_(Params params) const {
+//    override ref Result delegate_(Params params) {
 //        return Result(params);
 //    }
 //}
@@ -99,7 +99,7 @@ Non-reference provider that calls some function to create the provided object.
 `Function` the function called to create the provided object.
 */
 class Callable(alias Function) : Provider!(ReturnType!Function, Parameters!Function) {
-    override const(ReturnType!Function) delegate_(Params params) const {
+    override const(ReturnType!Function) delegate_(Params params) {
         return Function(params);
     }
 }
@@ -110,7 +110,7 @@ Reference provider that calls some function to create the provided object.
 `Function` the function called to create the provided object.
 */
 class ReferenceCallable(alias Function) : ReferenceProvider!(ReturnType!Function, Parameters!Function) {
-    override ref ReturnType!Function delegate_(Params params) const {
+    override ref ReturnType!Function delegate_(Params params) {
         return Function(params);
     }
 }
@@ -121,13 +121,13 @@ Base class for non-reference singletons. Uses another provider to create the obj
 `Base` is the type of this another provider.
 */
 class BaseGeneralSingleton(Base) : Provider!(Base.Result, Base.Params) {
-    private const Base _base;
+    private Base _base;
     /// Create the singleton with given base provider.
     this(Base base) {
         _base = base;
     }
     /// Get the base provider.
-    @property const(Base) base() const { return _base; }
+    @property ref Base base() { return _base; }
 }
 
 /**
@@ -136,13 +136,13 @@ Base class for reference singletons. Uses another provider to create the object.
 `Base` is the type of this another provider.
 */
 class ReferenceBaseGeneralSingleton(Base) : ReferenceProvider!(Base.Result, Base.Params) {
-    private const Base _base;
+    private Base _base;
     /// Create the singleton with given base provider.
     this(Base base) {
         _base = base;
     }
     /// Get the base provider.
-    @property const(Base) base() const { return _base; }
+    @property ref Base base() { return _base; }
 }
 
 /**
@@ -150,8 +150,8 @@ Non-reference thread-unsafe singleton.
 */
 class ThreadUnsafeSingleton(Base) : BaseGeneralSingleton!Base {
     this(Base base) { super(base); }
-    override const(Result) delegate_(Params params) const {
-        return noLockMemoizeMember!(const(Base), "delegate_")(base, params);
+    override const(Result) delegate_(Params params) {
+        return noLockMemoizeMember!(Base, "delegate_")(base, params);
     }
 }
 
@@ -160,8 +160,8 @@ Reference thread-unsafe singleton.
 */
 class ReferenceThreadUnsafeSingleton(Base) : ReferenceBaseGeneralSingleton!Base {
     this(Base base) { super(base); }
-    override ref Result delegate_(Params params) const {
-            return referenceNoLockMemoizeMember!(const(Base), "delegate_")(base, params);
+    override ref Result delegate_(Params params) {
+            return referenceNoLockMemoizeMember!(Base, "delegate_")(base, params);
     }
 }
 
@@ -170,8 +170,8 @@ Non-reference thread-safe singleton.
 */
 class ThreadSafeSingleton(Base) : BaseGeneralSingleton!Base {
     this(Base base) { super(base); }
-    override const(Result) delegate_(Params params) const {
-        return synchronizedMemoizeMember!(const(Base), "delegate_")(base, params);
+    override const(Result) delegate_(Params params) {
+        return synchronizedMemoizeMember!(Base, "delegate_")(base, params);
     }
 }
 
@@ -180,7 +180,7 @@ Reference thread-safe singleton.
 */
 class ReferenceThreadSafeSingleton(Base) : ReferenceBaseGeneralSingleton!Base {
     this(Base base) { super(base); }
-    override ref Result delegate_(Params params) const {
+    override ref Result delegate_(Params params) {
         return referenceSynchronizedMemoizeMember!(Base, "delegate_")(base, params);
     }
 }
@@ -190,9 +190,9 @@ Non-reference thread-local singleton.
 */
 class ThreadLocalSingleton(Base) : BaseGeneralSingleton!Base {
     this(Base base) { super(base); }
-    override const(Result) delegate_(Params params) const {
+    override const(Result) delegate_(Params params) {
         synchronized {
-            return memoizeMember!(const(Base), "delegate_")(base, params);
+            return memoizeMember!(Base, "delegate_")(base, params);
         }
     }
 }
@@ -202,7 +202,7 @@ Reference thread-local singleton.
 */
 class ReferenceThreadLocalSingleton(Base) : ReferenceBaseGeneralSingleton!Base {
     this(Base base) { super(base); }
-    override ref Result delegate_(Params params) const {
+    override ref Result delegate_(Params params) {
         synchronized {
             return referenceMemoizeMember!(Base, "delegate_")(base, params);
         }
