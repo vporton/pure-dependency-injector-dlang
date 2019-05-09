@@ -121,7 +121,7 @@ Base class for non-reference singletons. Uses another provider to create the obj
 `Base` is the type of this another provider.
 */
 class BaseGeneralSingleton(Base) : Provider!(Base.Result, Base.Params) {
-    private Base _base;
+    private const Base _base;
     /// Create the singleton with given base provider.
     this(Base base) {
         _base = base;
@@ -136,7 +136,7 @@ Base class for reference singletons. Uses another provider to create the object.
 `Base` is the type of this another provider.
 */
 class ReferenceBaseGeneralSingleton(Base) : ReferenceProvider!(Base.Result, Base.Params) {
-    private Base _base;
+    private const Base _base;
     /// Create the singleton with given base provider.
     this(Base base) {
         _base = base;
@@ -161,7 +161,7 @@ Reference thread-unsafe singleton.
 class ReferenceThreadUnsafeSingleton(Base) : ReferenceBaseGeneralSingleton!Base {
     this(Base base) { super(base); }
     override ref Result delegate_(Params params) const {
-        return noLockMemoizeMember!(Base, "delegate_")(base, params);
+            return referenceNoLockMemoizeMember!(const(Base), "delegate_")(base, params);
     }
 }
 
@@ -171,7 +171,7 @@ Non-reference thread-safe singleton.
 class ThreadSafeSingleton(Base) : BaseGeneralSingleton!Base {
     this(Base base) { super(base); }
     override const(Result) delegate_(Params params) const {
-        return synchroizedMemoizeMember!(const(Base), "delegate_")(base, params);
+        return synchronizedMemoizeMember!(const(Base), "delegate_")(base, params);
     }
 }
 
@@ -181,7 +181,7 @@ Reference thread-safe singleton.
 class ReferenceThreadSafeSingleton(Base) : ReferenceBaseGeneralSingleton!Base {
     this(Base base) { super(base); }
     override ref Result delegate_(Params params) const {
-        return synchroizedMemoizeMember!(Base, "delegate_")(base, params);
+        return referenceSynchronizedMemoizeMember!(Base, "delegate_")(base, params);
     }
 }
 
@@ -204,7 +204,7 @@ class ReferenceThreadLocalSingleton(Base) : ReferenceBaseGeneralSingleton!Base {
     this(Base base) { super(base); }
     override ref Result delegate_(Params params) const {
         synchronized {
-            return memoizeMember!(Base, "delegate_")(base, params);
+            return referenceMemoizeMember!(Base, "delegate_")(base, params);
         }
     }
 }
