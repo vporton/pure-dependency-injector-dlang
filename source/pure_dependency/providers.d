@@ -44,7 +44,7 @@ class Provider(Result_, Params_...) {
     final const(Result) call(S)(S s) const {
         return callMemberFunctionWithParamsStruct!(this, "opCall", S)(s);
     }
-    /// The abstarct virtual function used to create the provided object.
+    /// The abstract virtual function used to create the provided object.
     abstract const(Result) delegate_(Params params) const;
     alias DelegateType = const(Result) delegate (Params params) const;
     /// Returns `delegate_` as a delegate.
@@ -59,7 +59,8 @@ Base class for reference providers.
 * `Result_` the type of the object to be provided.
 
 * `Params_` the type of provider parameters.
-*/class ReferenceProvider(Result_, Params_...) {
+*/
+class ReferenceProvider(Result_, Params_...) {
     alias Result = Result_; /// the type of the object to be provided.
     alias Params = Params_; /// the type of provider parameters.
     /// Call the provider.
@@ -71,7 +72,7 @@ Base class for reference providers.
     final ref Result call(S)(S s) const {
         return callMemberFunctionWithParamsStruct!(this, "opCall", S)(s);
     }
-    /// The abstarct virtual function used to create the provided object.
+    /// The abstract virtual function used to create the provided object.
     abstract ref Result delegate_(Params params) const;
     alias DelegateType = ref Result delegate (Params params) const;
     /// Returns `delegate_` as a delegate.
