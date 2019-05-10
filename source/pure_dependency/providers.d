@@ -299,6 +299,27 @@ class ReferenceThreadLocalCallableSingleton(alias Function) : ReferenceThreadLoc
     }
 }
 
+/**
+Create provider with `defaults` of type `ParamsType.Regular` from a provider `Base`.
+
+`ParamsType` should be like a struct `S` created with
+```d
+mixin StructParams!("S", int, "x", float, "y"); // see struct-params package
+```
+
+Then use it like this:
+```d
+float calc(int x, float y) {
+    return x * y;
+}
+immutable S.Regular myDefaults = { x: 3, y: 2.1 };
+alias MyProvider = ProviderWithDefaults!(Callable!calc, S, myDefaults);
+
+immutable S.WithDefaults providerParams = { x: 2 }; // note y is default initialized to null
+auto provider = new MyProvider;
+assert(provider.callWithDefaults(providerParams) - 4.2 < 1e-6);
+```
+*/
 class ProviderWithDefaults(Base, ParamsType, alias defaults) : Base {
     Result callWithDefaults(ParamsType.WithDefaults params) {
         return call(combine(params, defaults));
