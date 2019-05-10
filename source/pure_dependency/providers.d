@@ -315,6 +315,13 @@ unittest {
 }
 
 unittest {
+    int x;
+    ref int f() { return x; }
+    auto cFactory = new ReferenceCallable!(f);
+    assert(&cFactory() == &x);
+}
+
+unittest {
     int obj = 3;
     int f(int a, int b) { return a + b; }
     ref int g() { return obj; }
@@ -334,8 +341,6 @@ unittest {
     auto refSingleton3 = new ReferenceThreadLocalCallableSingleton!g();
     assert(refSingleton3() == refSingleton3());
 }
-
-// TODO: Test FixedObject and reference providers.
 
 unittest {
     mixin StructParams!("S", int, "x", float, "y");
