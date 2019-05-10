@@ -41,7 +41,7 @@ class Provider(Result_, Params_...) {
     }
     /// Call it with a structure or class as the argument (expanding its members into arguments
     /// in order).
-    final const(Result) call(S)(S s) const {
+    final const(Result) call(S)(S s) {
         return callMemberFunctionWithParamsStruct!(this, "opCall", S)(s);
     }
     /// The abstract virtual function used to create the provided object.
@@ -299,6 +299,12 @@ class ReferenceThreadLocalCallableSingleton(alias Function) : ReferenceThreadLoc
     }
 }
 
+class ProviderWithDefaults(Base, ParamsType, alias defaults) : Base {
+    Result callWithDefaults(ParamsType.WithDefaults params) {
+        return call(combine(params, defaults));
+    }
+}
+
 unittest {
     class C {
         int v;
@@ -330,3 +336,17 @@ unittest {
 }
 
 // TODO: Test FixedObject and reference providers.
+
+unittest {
+    mixin StructParams!("S", int, "x", float, "y");
+    float calc(int x, float y) {
+        return x * y;
+    }
+    immutable S.Regular myDefaults = { x: 3, y: 2.1 };
+    alias MyProvider = ProviderWithDefaults!(Callable!calc, S, myDefaults);
+
+    immutable S.WithDefaults providerParams = { x: 2 }; // note y is default initialized to null
+    auto provider = new MyProvider;
+    assert(provider.callWithDefaults(providerParams) - 4.2 < 1e-6);
+}
+
