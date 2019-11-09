@@ -8,6 +8,6 @@
   "name" : "pure-dependency-injector",
   "dependencies" : {
     "memoize" : ">=3.2.0",
-    "struct-params" : ">=0.9.11"
+    "struct-params" : ">=0.9.12"
   }
 }
