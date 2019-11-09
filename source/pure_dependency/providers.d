@@ -312,7 +312,7 @@ Then use it like this:
 float calc(int x, float y) {
     return x * y;
 }
-immutable S.Regular myDefaults = { x: 3, y: 2.1 };
+immutable S.WithDefaults myDefaults = { x: 3, y: 2.1 }; // or `immutable S.Regular myDefaults`
 alias MyProvider = ProviderWithDefaults!(Callable!calc, S, myDefaults);
 
 immutable S.WithDefaults providerParams = { x: 2 }; // note y is default initialized to null
@@ -370,9 +370,14 @@ unittest {
     }
     immutable S.Regular myDefaults = { x: 3, y: 2.1 };
     alias MyProvider = ProviderWithDefaults!(Callable!calc, S, myDefaults);
+    immutable S.WithDefaults myDefaults2 = { x: 3, y: 2.1 };
+    alias MyProvider2 = ProviderWithDefaults!(Callable!calc, S, myDefaults2);
 
     immutable S.WithDefaults providerParams = { x: 2 }; // note y is default initialized to null
     auto provider = new MyProvider;
-    assert(provider.callWithDefaults(providerParams) - 4.2 < 1e-6);
+    auto provider2 = new MyProvider2;
+    import std.math : abs;
+    assert((provider.callWithDefaults(providerParams) - 4.2).abs < 1e-6);
+    assert((provider.callWithDefaults(providerParams) - 4.2).abs < 1e-6);
 }
 
