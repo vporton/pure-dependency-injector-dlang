@@ -321,7 +321,7 @@ assert(provider.callWithDefaults(providerParams) - 4.2 < 1e-6);
 ```
 */
 class ProviderWithDefaults(Base, ParamsType, alias defaults) : Base {
-    Result callWithDefaults(ParamsType.WithDefaults params) {
+    const(Result) callWithDefaults(ParamsType.WithDefaults params) {
         return call(combine(params, defaults));
     }
 }
