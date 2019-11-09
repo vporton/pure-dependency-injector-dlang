@@ -36,17 +36,17 @@ class Provider(Result_, Params_...) {
     alias Result = Result_; /// the type of the object to be provided.
     alias Params = Params_; /// the type of provider parameters.
     /// Call the provider.
-    final const(Result) opCall(Params params) {
+    final Result opCall(Params params) {
         return delegate_(params);
     }
     /// Call it with a structure or class as the argument (expanding its members into arguments
     /// in order).
-    final const(Result) call(S)(S s) {
+    final Result call(S)(S s) {
         return callMemberFunctionWithParamsStruct!(this, "opCall", S)(s);
     }
     /// The abstract virtual function used to create the provided object.
-    abstract const(Result) delegate_(Params params);
-    alias DelegateType = const(Result) delegate (Params params);
+    abstract Result delegate_(Params params);
+    alias DelegateType = Result delegate (Params params);
     /// Returns `delegate_` as a delegate.
     final @property DelegateType provider() {
         return &delegate_;
@@ -99,7 +99,7 @@ Non-reference provider that calls some function to create the provided object.
 `Function` the function called to create the provided object.
 */
 class Callable(alias Function) : Provider!(ReturnType!Function, Parameters!Function) {
-    override const(ReturnType!Function) delegate_(Params params) {
+    override ReturnType!Function delegate_(Params params) {
         return Function(params);
     }
 }
@@ -150,7 +150,7 @@ Non-reference thread-unsafe singleton.
 */
 class ThreadUnsafeSingleton(Base) : BaseGeneralSingleton!Base {
     this(Base base) { super(base); }
-    override const(Result) delegate_(Params params) {
+    override Result delegate_(Params params) {
         return noLockMemoizeMember!(Base, "delegate_")(base, params);
     }
 }
@@ -170,7 +170,7 @@ Non-reference thread-safe singleton.
 */
 class ThreadSafeSingleton(Base) : BaseGeneralSingleton!Base {
     this(Base base) { super(base); }
-    override const(Result) delegate_(Params params) {
+    override Result delegate_(Params params) {
         return synchronizedMemoizeMember!(Base, "delegate_")(base, params);
     }
 }
@@ -190,7 +190,7 @@ Non-reference thread-local singleton.
 */
 class ThreadLocalSingleton(Base) : BaseGeneralSingleton!Base {
     this(Base base) { super(base); }
-    override const(Result) delegate_(Params params) {
+    override Result delegate_(Params params) {
         synchronized {
             return memoizeMember!(Base, "delegate_")(base, params);
         }
@@ -215,7 +215,7 @@ Non-refernce provider that always returns the same object.
 `obj` is the object returned by the provider.
 */
 class FixedObject(alias obj) : Provider!(typeof(obj)) {
-    override const(Result) delegate_() const {
+    override Result delegate_() const {
         return obj;
     }
 }
@@ -321,7 +321,7 @@ assert(provider.callWithDefaults(providerParams) - 4.2 < 1e-6);
 ```
 */
 class ProviderWithDefaults(Base, ParamsType, alias defaults) : Base {
-    const(Result) callWithDefaults(ParamsType.WithDefaults params) {
+    Result callWithDefaults(ParamsType.WithDefaults params) {
         return call(combine(params, defaults));
     }
 }
