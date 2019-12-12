@@ -324,6 +324,10 @@ class ProviderWithDefaults(Base, ParamsType, alias defaults) : Base {
     Result callWithDefaults(ParamsType.WithDefaults params) {
         return call(combine(params, defaults));
     }
+    Result opCall() {
+        ParamsType.WithDefaults params = {};
+        return callWithDefaults(params);
+    }
 }
 
 unittest {
